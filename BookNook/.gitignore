@@ -33,4 +33,19 @@ build/
 .vscode/
 
 ### ENV Files ###
-.env
+src/main/resources/.env
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# IDE-specific files
+compiler.xml
+encodings.xml
+misc.xml
+modules.xml
+uiDesigner.xml
+vcs.xml
+jarRepositories.xml
