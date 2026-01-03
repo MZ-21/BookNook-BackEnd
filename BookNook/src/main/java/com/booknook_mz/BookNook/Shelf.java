@@ -10,9 +10,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Shelf {
-
     @Id
-    private ObjectId shelfId;
+    private String id;
     private String shelfName;
     private String icon;
     //private String numberIcons;
@@ -23,7 +22,6 @@ public class Shelf {
         this.icon = icon;
         this.bookCollection = bookCollection;
     }
-
     public void addBook(Book book) {
         this.bookCollection.add(book);
     }

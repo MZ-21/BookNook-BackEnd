@@ -6,6 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.management.ConstructorParameters;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,17 +19,19 @@ import java.util.Optional;
 @CrossOrigin(origins="http://localhost:3000/")
 public class BookController {
     @Autowired
-    private BookService bookService;
-    @GetMapping
-    public ResponseEntity<List<Book>> getSomeBooks(){
-        List<Book> allBooks = bookService.allBooks();
-        List<Book> someBooks = allBooks.subList(0,51);
-        System.out.println(someBooks.size());
-        return new ResponseEntity<>(someBooks, HttpStatus.OK);
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
     }
 
-    @GetMapping("/{bookId}")//search by id
-    public ResponseEntity<Optional<Book>> getSingleBook(@PathVariable String bookId){//PathVariable means whatever getting from PathVariable convert to objectid
-        return new ResponseEntity<Optional<Book>>(bookService.singleBook(bookId),HttpStatus.OK);
+    @GetMapping("/search")//finding search matches
+    public List<Book> search(@RequestParam("q") String q){
+        return bookService.searchTopTen(q);
     }
+
+//    @GetMapping("/{bookId}")//search by id
+//    public ResponseEntity<Optional<Book>> getSingleBook(@PathVariable String bookId){//PathVariable means whatever getting from PathVariable convert to objectid
+//        return new ResponseEntity<Optional<Book>>(bookService.singleBook(bookId),HttpStatus.OK);
+//    }
 }

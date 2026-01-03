@@ -23,8 +23,8 @@ public class ShelfController {
         List<Book> bookCollection = new ArrayList<>();
         Map<String, Object> bookMap = (Map<String, Object>) payload.get("bookCollection");
 
-        Book b = createBook(bookMap);
-        bookCollection.add(b);
+//        Book b = createBook(bookMap);
+//        bookCollection.add(b);
         return new ResponseEntity<Shelf>(shelfService.createShelf(shelfName, icon, bookCollection), HttpStatus.CREATED);
     }
 
@@ -38,25 +38,59 @@ public class ShelfController {
         return new ResponseEntity<>(shelfNames, HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteShelf")
-    public void deleteShelf(@RequestBody Map<String, String> payload){
-        shelfService.deleteShelf(payload.get("shelfName"));
+    @GetMapping("/shelves")
+    public ResponseEntity<List<Shelf>> getShelves(){
+        return new ResponseEntity<>(shelfService.allShelves(), HttpStatus.OK);
+    }
+
+
+    @PostMapping("/deleteShelf")
+    public void deleteShelf(@RequestBody Map<String, String> payload) {
+        String shelfId = payload.get("shelfId");
+        if (shelfId == null) {
+            throw new IllegalArgumentException("Shelf name must be provided");
+        }
+        System.out.println(shelfId);
+        shelfService.deleteShelf(shelfId);
+    }
+    @PostMapping("/editName")
+    public void editShelfName(@RequestBody Map<String, String> payload) {
+        String shelfId = payload.get("shelfId");
+        String newShelfName = payload.get("shelfName");
+        System.out.println(shelfId);
+        System.out.println(newShelfName);
+        shelfService.editShelfName(shelfId, newShelfName);
+    }
+    @GetMapping("/getBooks/{shelf}")
+    public ResponseEntity<List<Book>> getBookCollection(@PathVariable String shelf) {
+        return new ResponseEntity<>(shelfService.getBookCollection(shelf), HttpStatus.OK);
     }
 
     @PostMapping("/addBook")
     public ResponseEntity<Shelf> addBook(@RequestBody Map<String, Object> payload) {
-        String shelfName = payload.get("shelfName").toString();
+        System.out.println("in shelf");
+        String shelfName = payload.get("id").toString();
         Map<String, Object> bookMap = (Map<String, Object>) payload.get("book");
-
         Book book = createBook(bookMap);
-
         return new ResponseEntity<Shelf>(shelfService.addBookToShelf(shelfName, book), HttpStatus.OK);
     }
 
     public Book createBook(Map<String, Object> bookMap) {
         Book book = new Book();
-        ObjectId id = new ObjectId(bookMap.get("id").toString());
-        book.setId(id);
+        Object raw = bookMap.get("bookId");
+
+        if (raw instanceof String) {
+            if (ObjectId.isValid((String) raw)) {
+                book.setId(new ObjectId((String) raw));
+            }
+        } else if (raw instanceof Map) {
+            // Fallback in case MongoDB ObjectId got serialized as a map
+            // Try to reconstruct ObjectId from hex or just create a new one
+            System.out.println("bookId is not a string — it's a map: " + raw);
+        } else {
+            System.out.println("bookId has unknown type: " + raw.getClass().getName());
+        }
+
         book.setBookId((String) bookMap.get("bookId"));
         book.setTitle((String) bookMap.get("title"));
         book.setAuthor((String) bookMap.get("author"));

@@ -35,12 +35,6 @@ build/
 ### ENV Files ###
 src/main/resources/.env
 
-# IntelliJ IDEA files
-.idea/
-*.iml
-*.iws
-*.ipr
-
 # IDE-specific files
 compiler.xml
 encodings.xml
